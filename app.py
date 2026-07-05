@@ -150,7 +150,10 @@ def webhook():
             ])
 
             schedule_reminder(update.message.chat_id, text, reminder_date)
-
+            
+            event_str = format_khmer_date(event_date)
+            reminder_str = format_khmer_date(reminder_date)
+            
             bot.send_message(update.message.chat_id,
                              f""" បានកត់ត្រាជោគជ័យ!
                              📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
