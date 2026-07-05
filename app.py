@@ -46,6 +46,17 @@ KHMER_MONTHS = {
     "ឧសភា": 5, "មិថុនា": 6, "កក្កដា": 7, "សីហា": 8,
     "កញ្ញា": 9, "តុលា": 10, "វិច្ឆិកា": 11, "ធ្នូ": 12
 }
+# ===== Convert Khmer numbers to Arabic =====
+
+KHMER_DIGITS = {
+    "០": "0", "១": "1", "២": "2", "៣": "3", "៤": "4",
+    "៥": "5", "៦": "6", "៧": "7", "៨": "8", "៩": "9"
+}
+
+def convert_khmer_numbers(text):
+    for kh, ar in KHMER_DIGITS.items():
+        text = text.replace(kh, ar)
+    return text
 
 def parse_khmer_date(text):
     pattern = r"(\d{1,2})\s*ខែ\s*([^\s]+)\s*(\d{4})"
