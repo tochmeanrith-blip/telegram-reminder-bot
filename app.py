@@ -79,7 +79,7 @@ def convert_khmer_numbers(text):
     return text
 
 def parse_khmer_date(text):
-       text = text.strip()
+    text = text.strip()
     text = convert_khmer_numbers(text)
     today = datetime.now()
 
@@ -125,6 +125,8 @@ def parse_khmer_date(text):
 
         if month:
             return datetime(year, month, day)
+
+    return None
 
 # ===== FLASK APP =====
 app = Flask(__name__)
