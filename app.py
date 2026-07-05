@@ -155,10 +155,10 @@ def webhook():
             reminder_str = format_khmer_date(reminder_date)
             
             bot.send_message(update.message.chat_id,
-                             f""" បានកត់ត្រាជោគជ័យ!
+                             " បានកត់ត្រាជោគជ័យ!
                              📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
                              🔔 ថ្ងៃរំលឹក: {reminder_str}
-                             """)
+                             ")
         else:
             bot.send_message(update.message.chat_id,
                              "❌ សូមសរសេរថ្ងៃជាទម្រង់: 15 ខែ សីហា 2026")
