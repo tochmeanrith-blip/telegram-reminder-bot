@@ -91,11 +91,7 @@ def parse_khmer_date(text):
     if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
         return today + timedelta(days=7)
 
-​​​    # ✅ សប្ដាហ៍ក្រោយ
-    if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
-        return today + timedelta(days=7)
-
-      # ✅ ខែក្រោយ
+    # ✅ ខែក្រោយ
     if "ខែក្រោយ" in text:
         month = today.month + 1
         year = today.year
