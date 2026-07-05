@@ -41,7 +41,17 @@ def schedule_reminder(chat_id, message, run_date):
     )
 
 # ===== KHMER DATE PARSER =====
-KHMER_MONTHS = {
+KHMER_MONTH_NAMES = {
+    1: "មករា", 2: "កុម្ភៈ", 3: "មីនា", 4: "មេសា",
+    5: "ឧសភា", 6: "មិថុនា", 7: "កក្កដា", 8: "សីហា",
+    9: "កញ្ញា", 10: "តុលា", 11: "វិច្ឆិកា", 12: "ធ្នូ"
+}
+
+def format_khmer_date(date_obj):
+    day = date_obj.day
+    month = KHMER_MONTH_NAMES[date_obj.month]
+    year = date_obj.year
+    return f"{day} ខែ{month} {year}"
     "មករា": 1, "កុម្ភៈ": 2, "មីនា": 3, "មេសា": 4,
     "ឧសភា": 5, "មិថុនា": 6, "កក្កដា": 7, "សីហា": 8,
     "កញ្ញា": 9, "តុលា": 10, "វិច្ឆិកា": 11, "ធ្នូ": 12
