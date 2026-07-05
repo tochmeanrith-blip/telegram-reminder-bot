@@ -16,6 +16,7 @@ TIMEZONE = "Asia/Phnom_Penh"
 
 # ===== TELEGRAM =====
 bot = telegram.Bot(token=BOT_TOKEN)
+last_update_id = None
 
 # ===== GOOGLE AUTH =====
 creds_dict = json.loads(os.environ["GOOGLE_CREDS_JSON"])
@@ -55,10 +56,19 @@ def schedule_reminder(chat_id, message, run_date):
     )
 
 # ===== KHMER DATE PARSER =====
-KHMER_MONTHS = {
-    "មករា": 1, "កុម្ភៈ": 2, "មីនា": 3, "មេសា": 4,
-    "ឧសភា": 5, "មិថុនា": 6, "កក្កដា": 7, "សីហា": 8,
-    "កញ្ញា": 9, "តុលា": 10, "វិច្ឆិកា": 11, "ធ្នូ": 12
+KHMER_MONTH_NAMES = {
+    1: "មករា",
+    2: "កុម្ភៈ",
+    3: "មីនា",
+    4: "មេសា",
+    5: "ឧសភា",
+    6: "មិថុនា",
+    7: "កក្កដា",
+    8: "សីហា",
+    9: "កញ្ញា",
+    10: "តុលា",
+    11: "វិច្ឆិកា",
+    12: "ធ្នូ"
 }
 
 def format_khmer_date(date_obj):
@@ -134,7 +144,12 @@ app = Flask(__name__)
 @app.route("/webhook", methods=["POST"])
 def webhook():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
+​​​​    global last_update_id
 
+    if last_update_id == update.update_id:
+       return "OK"
+
+    last_update_id = update.update_id
     if update.message and update.message.text:
         text = update.message.text.strip()
 
@@ -180,9 +195,9 @@ def webhook():
                 update.message.chat_id,
                 f"""✅ បានកត់ត្រាជោគជ័យ!
 
-📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
-🔔 ថ្ងៃរំលឹក: {reminder_str}
-"""
+                📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
+                🔔 ថ្ងៃរំលឹក: {reminder_str}
+                """
             )
         else:
             bot.send_message(
