@@ -32,6 +32,20 @@ sheet = client.open(SHEET_NAME).sheet1
 # ===== SCHEDULER =====
 scheduler = BackgroundScheduler(timezone=TIMEZONE)
 scheduler.start()
+scheduler.add_job(check_reminders, 'interval', minutes=1)
+
+def check_reminders():
+    records = sheet.get_all_values()[1:]
+    now = datetime.now().strftime("%Y-%m-%d")
+
+    for i, row in enumerate(records, start=2):
+        reminder_date = row[2]
+        chat_id = row[3]
+        message = row[0]
+
+        if reminder_date == now:
+            bot.send_message(chat_id, f"🔔 រំលឹក: {message}")
+            sheet.delete_rows(i)
 
 def schedule_reminder(chat_id, message, run_date):
     scheduler.add_job(
@@ -46,6 +60,12 @@ KHMER_MONTHS = {
     "ឧសភា": 5, "មិថុនា": 6, "កក្កដា": 7, "សីហា": 8,
     "កញ្ញា": 9, "តុលា": 10, "វិច្ឆិកា": 11, "ធ្នូ": 12
 }
+
+def format_khmer_date(date_obj):
+    day = date_obj.day
+    month = KHMER_MONTH_NAMES[date_obj.month]
+    year = date_obj.year
+    return f"{day} ខែ{month} {year}"
 
 # ===== Convert Khmer numbers to Arabic =====
 KHMER_DIGITS = {
@@ -70,6 +90,25 @@ def parse_khmer_date(text):
     # ✅ សប្ដាហ៍ក្រោយ
     if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
         return today + timedelta(days=7)
+
+​​​    # ✅ សប្ដាហ៍ក្រោយ
+    if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
+        return today + timedelta(days=7)
+
+      # ✅ ខែក្រោយ
+    if "ខែក្រោយ" in text:
+        month = today.month + 1
+        year = today.year
+        if month > 12:
+            month = 1
+            year += 1
+        return datetime(year, month, today.day)
+        
+    # ✅ X ថ្ងៃក្រោយ (ឧ: 3 ថ្ងៃក្រោយ)
+    match_days = re.search(r"(\d+)\s*ថ្ងៃក្រោយ", text)
+    if match_days:
+        days = int(match_days.group(1))
+        return today + timedelta(days=days)    
 
     # ✅ Format: 15 ខែសីហា 2026
     pattern = r"(\d{1,2})\s*ខែ\s*([^\s]+)\s*(\d{4})"
@@ -110,8 +149,17 @@ def webhook():
 
             schedule_reminder(update.message.chat_id, text, reminder_date)
 
-            bot.send_message(update.message.chat_id,
-                             "✅ បានកត់ត្រា និងកំណត់រំលឹករួច!")
+            event_str = format_khmer_date(event_date)
+reminder_str = format_khmer_date(reminder_date)
+
+bot.send_message(
+    update.message.chat_id,
+    f"""✅ បានកត់ត្រាជោគជ័យ!
+
+📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
+🔔 ថ្ងៃរំលឹក: {reminder_str}
+"""
+)
         else:
             bot.send_message(update.message.chat_id,
                              "❌ សូមសរសេរថ្ងៃជាទម្រង់: 15 ខែ សីហា 2026")
