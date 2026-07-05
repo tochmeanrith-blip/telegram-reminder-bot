@@ -48,12 +48,15 @@ KHMER_MONTHS = {
 }
 
 def parse_khmer_date(text):
-    pattern = r"(\d{1,2})\s*ខែ\s*(\w+)\s*(\d{4})"
+    pattern = r"(\d{1,2})\s*ខែ\s*([^\s]+)\s*(\d{4})"
     match = re.search(pattern, text)
     if match:
         day = int(match.group(1))
-        month = KHMER_MONTHS.get(match.group(2))
+        month_name = match.group(2).strip()
         year = int(match.group(3))
+
+        month = KHMER_MONTHS.get(month_name)
+
         if month:
             return datetime(year, month, day)
     return None
