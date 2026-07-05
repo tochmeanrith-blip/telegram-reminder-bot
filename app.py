@@ -30,10 +30,6 @@ client = gspread.authorize(creds)
 sheet = client.open(SHEET_NAME).sheet1
 
 # ===== SCHEDULER =====
-scheduler = BackgroundScheduler(timezone=TIMEZONE)
-scheduler.start()
-scheduler.add_job(check_reminders, 'interval', minutes=1)
-
 def check_reminders():
     records = sheet.get_all_values()[1:]
     now = datetime.now().strftime("%Y-%m-%d")
@@ -46,6 +42,10 @@ def check_reminders():
         if reminder_date == now:
             bot.send_message(chat_id, f"🔔 រំលឹក: {message}")
             sheet.delete_rows(i)
+            
+scheduler = BackgroundScheduler(timezone=TIMEZONE)
+scheduler.add_job(check_reminders, 'interval', minutes=1)
+scheduler.start()
 
 def schedule_reminder(chat_id, message, run_date):
     scheduler.add_job(
