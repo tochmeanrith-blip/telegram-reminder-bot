@@ -47,18 +47,44 @@ KHMER_MONTHS = {
     "កញ្ញា": 9, "តុលា": 10, "វិច្ឆិកា": 11, "ធ្នូ": 12
 }
 
+# ===== Convert Khmer numbers to Arabic =====
+KHMER_DIGITS = {
+    "០": "0", "១": "1", "២": "2", "៣": "3", "៤": "4",
+    "៥": "5", "៦": "6", "៧": "7", "៨": "8", "៩": "9"
+}
+
+def convert_khmer_numbers(text):
+    for kh, ar in KHMER_DIGITS.items():
+        text = text.replace(kh, ar)
+    return text
+
 def parse_khmer_date(text):
+    text = text.strip()
+    text = convert_khmer_numbers(text)
+    today = datetime.now()
+
+    # ✅ ស្អែក
+    if "ស្អែក" in text:
+        return today + timedelta(days=1)
+
+    # ✅ សប្ដាហ៍ក្រោយ
+    if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
+        return today + timedelta(days=7)
+
+    # ✅ Format: 15 ខែសីហា 2026
     pattern = r"(\d{1,2})\s*ខែ\s*([^\s]+)\s*(\d{4})"
     match = re.search(pattern, text)
+
     if match:
         day = int(match.group(1))
-        month_name = match.group(2).strip()
+        month_name = match.group(2).replace("ខែ", "").strip()
         year = int(match.group(3))
 
         month = KHMER_MONTHS.get(month_name)
 
         if month:
             return datetime(year, month, day)
+
     return None
 
 # ===== FLASK APP =====
