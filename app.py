@@ -16,7 +16,6 @@ TIMEZONE = "Asia/Phnom_Penh"
 
 # ===== TELEGRAM =====
 bot = telegram.Bot(token=BOT_TOKEN)
-last_update_id = None
 
 # ===== GOOGLE AUTH =====
 creds_dict = json.loads(os.environ["GOOGLE_CREDS_JSON"])
@@ -144,12 +143,7 @@ app = Flask(__name__)
 @app.route("/webhook", methods=["POST"])
 def webhook():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-​​​​    global last_update_id
-
-    if last_update_id == update.update_id:
-       return "OK"
-
-    last_update_id = update.update_id
+​
     if update.message and update.message.text:
         text = update.message.text.strip()
 
