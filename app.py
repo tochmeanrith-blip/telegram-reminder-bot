@@ -138,6 +138,29 @@ def webhook():
     if update.message and update.message.text:
         text = update.message.text.strip()
 
+        # ✅ មើលបញ្ជី
+        if text == "/list":
+            records = sheet.get_all_values()[1:]
+            if not records:
+                bot.send_message(update.message.chat_id, "📭 គ្មាន Reminder ទេ")
+            else:
+                msg = "📋 បញ្ជី Reminder:\n\n"
+                for i, row in enumerate(records, start=1):
+                    msg += f"{i}. {row[0]} ({row[1]})\n"
+                bot.send_message(update.message.chat_id, msg)
+            return "OK"
+
+        # ✅ លុប
+        if text.startswith("/delete"):
+            try:
+                index = int(text.split(" ")[1])
+                sheet.delete_rows(index + 1)
+                bot.send_message(update.message.chat_id, "🗑 លុបរួចហើយ")
+            except:
+                bot.send_message(update.message.chat_id, "❌ ប្រើទម្រង់: /delete 1")
+            return "OK"
+
+        # ✅ Parse ថ្ងៃ
         event_date = parse_khmer_date(text)
 
         if event_date:
