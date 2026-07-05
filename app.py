@@ -79,19 +79,22 @@ def convert_khmer_numbers(text):
     return text
 
 def parse_khmer_date(text):
-    text = text.strip()
+       text = text.strip()
     text = convert_khmer_numbers(text)
     today = datetime.now()
 
-    # ✅ ស្អែក
+    if "ថ្ងៃនេះ" in text:
+        return today
+
     if "ស្អែក" in text:
         return today + timedelta(days=1)
 
-    # ✅ សប្ដាហ៍ក្រោយ
+    if "ម្សិលមិញ" in text:
+        return today - timedelta(days=1)
+
     if "សប្ដាហ៍ក្រោយ" in text or "សប្តាហ៍ក្រោយ" in text:
         return today + timedelta(days=7)
 
-    # ✅ ខែក្រោយ
     if "ខែក្រោយ" in text:
         month = today.month + 1
         year = today.year
@@ -99,14 +102,17 @@ def parse_khmer_date(text):
             month = 1
             year += 1
         return datetime(year, month, today.day)
-        
-    # ✅ X ថ្ងៃក្រោយ (ឧ: 3 ថ្ងៃក្រោយ)
+
     match_days = re.search(r"(\d+)\s*ថ្ងៃក្រោយ", text)
     if match_days:
         days = int(match_days.group(1))
-        return today + timedelta(days=days)    
+        return today + timedelta(days=days)
 
-    # ✅ Format: 15 ខែសីហា 2026
+    match_weeks = re.search(r"(\d+)\s*សប្ដាហ៍ក្រោយ", text)
+    if match_weeks:
+        weeks = int(match_weeks.group(1))
+        return today + timedelta(weeks=weeks)
+
     pattern = r"(\d{1,2})\s*ខែ\s*([^\s]+)\s*(\d{4})"
     match = re.search(pattern, text)
 
@@ -119,8 +125,6 @@ def parse_khmer_date(text):
 
         if month:
             return datetime(year, month, day)
-
-    return None
 
 # ===== FLASK APP =====
 app = Flask(__name__)
