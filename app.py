@@ -70,7 +70,7 @@ def webhook():
 
 ​​    text = update.message.text.strip()
 
-    # ✅ មើលបញ្ជី reminder
+    # បញ្ជី reminder
     if text == "/list":
             records = sheet.get_all_values()[1:]
             if not records:
@@ -82,7 +82,7 @@ def webhook():
                 bot.send_message(update.message.chat_id, msg)
             return "OK"
 
-    # ✅ លុប reminder
+    # លុប reminder
     if text.startswith("/delete"):
             try:
                 index = int(text.split(" ")[1])
