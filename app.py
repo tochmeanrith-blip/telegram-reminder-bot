@@ -136,7 +136,8 @@ def webhook():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
 
     if update.message and update.message.text:
-        text = update.message.text
+        text = update.message.text.strip()
+
         event_date = parse_khmer_date(text)
 
         if event_date:
@@ -149,22 +150,22 @@ def webhook():
                 update.message.chat_id
             ])
 
-            schedule_reminder(update.message.chat_id, text, reminder_date)
-
             event_str = format_khmer_date(event_date)
-reminder_str = format_khmer_date(reminder_date)
+            reminder_str = format_khmer_date(reminder_date)
 
-bot.send_message(
-    update.message.chat_id,
-    f"""✅ បានកត់ត្រាជោគជ័យ!
+            bot.send_message(
+                update.message.chat_id,
+                f"""✅ បានកត់ត្រាជោគជ័យ!
 
 📅 ថ្ងៃព្រឹត្តិការណ៍: {event_str}
 🔔 ថ្ងៃរំលឹក: {reminder_str}
 """
-)
+            )
         else:
-            bot.send_message(update.message.chat_id,
-                             "❌ សូមសរសេរថ្ងៃជាទម្រង់: 15 ខែ សីហា 2026")
+            bot.send_message(
+                update.message.chat_id,
+                "❌ មិនអាចយល់ថ្ងៃបានទេ"
+            )
 
     return "OK"
 
